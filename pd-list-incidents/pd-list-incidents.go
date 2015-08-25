@@ -9,14 +9,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/quiffman/go-pagerduty/pagerduty"
 )
 
 var (
-	subdomain string
-	apiKey    string
+	subdomain string = os.Getenv("PD_SUBDOMAIN")
+	apiKey    string = os.Getenv("PD_APIKEY")
 	filter    string
 )
 

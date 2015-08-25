@@ -4,14 +4,15 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/GeoNet/pagerduty-jobs/finduser"
 	"github.com/quiffman/go-pagerduty/pagerduty"
 )
 
 var (
-	subdomain string
-	apiKey    string
+	subdomain string = os.Getenv("PD_SUBDOMAIN")
+	apiKey    string = os.Getenv("PD_APIKEY")
 	user      string
 )
 

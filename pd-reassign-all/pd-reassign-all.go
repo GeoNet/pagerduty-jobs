@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"os"
 
 	"github.com/GeoNet/pagerduty-jobs/finduser"
 	"github.com/quiffman/go-pagerduty/pagerduty"
@@ -15,8 +16,8 @@ var (
 )
 
 var (
-	subdomain string
-	apiKey    string
+	subdomain string = os.Getenv("PD_SUBDOMAIN")
+	apiKey    string = os.Getenv("PD_APIKEY")
 	fromUser  string
 	toUser    string
 	toLevel   int = -1
