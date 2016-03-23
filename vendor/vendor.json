@@ -1,0 +1,17 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "eN5IVV7nOL/bR7xdP3vkIVAGm+s=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "547ef5ac979778feb2f760cdb5f4eae1a2207b86"
+		},
+		{
+			"checksumSHA1": "rAfHpNlBWCC/QUs+T+DzyB8ZSSE=",
+			"path": "github.com/quiffman/go-pagerduty/pagerduty",
+			"revision": "2ffd42c8cf6f39685ec1f7465d06c62effe25f1b"
+		}
+	],
+	"rootPath": "github.com/GeoNet/pagerduty-jobs"
+}
