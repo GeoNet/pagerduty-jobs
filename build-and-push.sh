@@ -5,6 +5,8 @@ umask 0022
 REPO="github.com"
 ORG="GeoNet"
 
+BUILD_CONTAINER="golang:1.6.0-alpine"
+
 name=$(basename ${PWD})
 p="${REPO}/${ORG}/${name}"
 w="/go/src/${p}"
@@ -15,7 +17,7 @@ docker run --rm \
     -v ${PWD}:${w}:ro \
     -v ${PWD}/bin:/go/bin \
     -w ${w} \
-    golang:1.6.0-alpine \
+    ${BUILD_CONTAINER} \
     go install -a -ldflags "${BUILD}" -installsuffix cgo ./...
 
 docker build -t ${name}:base - < Dockerfile.base
