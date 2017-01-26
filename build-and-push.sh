@@ -5,7 +5,7 @@ umask 0022
 REPO="github.com"
 ORG="GeoNet"
 
-BUILD_CONTAINER="golang:1.6.0-alpine"
+BUILD_CONTAINER="golang:1.7.4-alpine"
 
 name=$(basename ${PWD})
 p="${REPO}/${ORG}/${name}"
