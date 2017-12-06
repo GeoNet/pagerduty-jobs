@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/GeoNet/pagerduty-jobs/finduser"
+	"github.com/GeoNet/pagerduty-jobs/internal/finduser"
 	"github.com/quiffman/go-pagerduty/pagerduty"
 )
 
