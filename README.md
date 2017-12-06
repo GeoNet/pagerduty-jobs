@@ -2,6 +2,8 @@
 
 Project for jobs related to pagerduty.
 
+[![Build Status](https://travis-ci.org/GeoNet/pagerduty-jobs.svg?branch=master)](https://travis-ci.org/GeoNet/pagerduty-jobs)
+
 ## pd-reassign-all
 
 Replaces a no longer working python script.
