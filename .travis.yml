@@ -3,7 +3,7 @@ sudo: required
 language: go
 
 go:
-  - 1.7.4
+  - 1.9
 
 services:
   - docker
@@ -14,7 +14,7 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: ./build-and-push.sh
+  script: ./build-push.sh cmd/pd-reassign-all
   on:
     branch: master
 
@@ -23,6 +23,7 @@ notifications:
 
 env:
   global:
+    - ALPINE_VERSION=3.8
     - secure: "Tma+yLMj8JgUP+5B18qIQVR1mS0jOZO8WamMeIzNvQBpGYHffMlmdzzGse5tVBQ6Pcsty/KmaUjG23ujC5hsuWwJHL1q/UeJ0E2dMqtGSumK36WY9NJwDBGfrP74sv60KoTlLnbwy7Y5f4z/NPRrC6ssVyHbURVH+HErhZ47IzlPS9DS/lwTejL6CkR9aRRZ0MS005TI9/py0sVpUoHkf29ioid7WbZRihdFL8rhn9d+uXil0metQTcIeuzysum23wddhgql845BmqW0Jy6XkrtLmVfiJ5wPTL22Ajt6CZnPacpw3PlK3EIxE//Om0/LVwZa/jx/tLnn7SrYccA0DlhkawSqJxWllAQhDHpai7R17hS6zJ0D1TxlyH49Ctha+OqNQ0Cc0ZUHXNG8VQ5Dcuoo4g+r/Ewu4gJvfcd+vSQM9904kBHM0yJ7/Xi9qB4QdsPEMWrglcnVIv39pQ5bU+cAKG4o/bTVGUZIp7N0CF55P2DWpI10mnHKYp+SzN2FpU8CaGXKzpPas8XDs8inTv2DrQ2bzEo0byx0wsgfMKFSzh9RurchPchE3vN5XOOgev+6I03zeB2x0oQ3GcFZ8Zc25FPB3gInJQM4/IokksXw4AlmO937e+u/2UD4KDGJSkKbKhw45Lqu/s6YMuqQhQku/psE6e/k3K1hIcxgWNE="
 
 #  vim: set ts=2 sw=2 tw=0 et:
