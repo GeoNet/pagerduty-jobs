@@ -1,56 +1,53 @@
 // pd-list-incidents lists incidents according to a given filter set of incident options, e.g.
-// ./pd-list-incidents -subdomain="subdomain" -api-key="api-key" -filter='{"Status":"triggered"}'
-// ./pd-list-incidents -subdomain="subdomain" -api-key="api-key" -filter='{"DateRange":"all"}'
-// ./pd-list-incidents -subdomain="subdomain" -api-key="api-key" -filter='{"DateRange":"all","Service":"PDAB123,PDABXYZ"}'
+// ./pd-list-incidents -authtoken="y_token" -filter='{"Statuses":["triggered"]}'
+// ./pd-list-incidents -authtoken="y_token" -filter='{"DateRange":"all"}'
+// ./pd-list-incidents -authtoken="y_token" -filter='{"DateRange":"all","ServiceIDs":[PDAB123,PDABXYZ"]}'
 package main
 
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
-	"time"
 
-	"github.com/quiffman/go-pagerduty/pagerduty"
+	pagerduty "github.com/PagerDuty/go-pagerduty"
 )
 
 var (
-	subdomain string = os.Getenv("PD_SUBDOMAIN")
-	apiKey    string = os.Getenv("PD_APIKEY")
+	authToken string = os.Getenv("PD_AUTHTOKEN")
 	filter    string
 )
 
 func init() {
-	flag.StringVar(&subdomain, "subdomain", subdomain, "The subdomain to be used for the Pagerduty API.")
-	flag.StringVar(&apiKey, "api-key", apiKey, "The api-key authorized for calls to the Pagerduty API.")
+	flag.StringVar(&authToken, "authtoken", authToken, "The authorization token for calls to the Pagerduty API.")
 
 	flag.StringVar(&filter, "filter", filter, "The incident options to filter incidents.")
 
 	flag.Parse()
 
-	if subdomain == "" || apiKey == "" {
-		log.Fatalln("PagerDuty subdomain and API token are required.")
+	if authToken == "" {
+		log.Fatalln("PagerDuty auth token is required.")
 	}
 }
 
 func main() {
-	pd := pagerduty.New(subdomain, apiKey)
+	pd := pagerduty.NewClient(authToken)
 
-	var opts pagerduty.IncidentsOptions
+	var opts pagerduty.ListIncidentsOptions
 	if err := json.Unmarshal([]byte(filter), &opts); err != nil {
 		log.Fatalln("Failed to parse filter: " + err.Error())
 	}
 
-	incidents, err := pd.Incidents.ListAll(&opts)
+	log.Printf("opts: %v\n", opts)
+	resp, err := pd.ListIncidents(opts)
 
-	fmt.Printf("found %d incidents\n", len(incidents))
 	if err != nil {
 		log.Fatalln("Failed to fetch incidents for given filter: " + err.Error())
-	} else {
-		for _, i := range incidents {
-			fmt.Printf("%v, %d, %s\n", i.CreatedOn.Format(time.RFC3339), i.IncidentNumber, i.Summary.Description)
-		}
+	}
+
+	log.Printf("found %d incidents\n", len(resp.Incidents))
+	for _, i := range resp.Incidents {
+		log.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
 	}
 
 }
