@@ -3,14 +3,16 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "ZZl8pzQ02pXz7ZopE114/AQEpTs=",
+			"origin": "github.com/GeoNet/pagerduty-jobs/vendor/github.com/PagerDuty/go-pagerduty",
+			"path": "github.com/PagerDuty/go-pagerduty",
+			"revision": "f8abccb6ece0aab77047b35930544e4aa089ede3",
+			"revisionTime": "2018-09-10T16:24:58+12:00"
+		},
+		{
 			"checksumSHA1": "eN5IVV7nOL/bR7xdP3vkIVAGm+s=",
 			"path": "github.com/google/go-querystring/query",
 			"revision": "547ef5ac979778feb2f760cdb5f4eae1a2207b86"
-		},
-		{
-			"checksumSHA1": "rAfHpNlBWCC/QUs+T+DzyB8ZSSE=",
-			"path": "github.com/quiffman/go-pagerduty/pagerduty",
-			"revision": "2ffd42c8cf6f39685ec1f7465d06c62effe25f1b"
 		}
 	],
 	"rootPath": "github.com/GeoNet/pagerduty-jobs"

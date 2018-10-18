@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/GeoNet/pagerduty-jobs/finduser"
-	"github.com/quiffman/go-pagerduty/pagerduty"
+	"github.com/GeoNet/pagerduty-jobs/internal/finduser"
+	pagerduty "github.com/PagerDuty/go-pagerduty"
 )
 
 var (
@@ -16,16 +16,14 @@ var (
 )
 
 var (
-	subdomain string = os.Getenv("PD_SUBDOMAIN")
-	apiKey    string = os.Getenv("PD_APIKEY")
+	authToken string = os.Getenv("PD_AUTHTOKEN")
 	fromUser  string
 	toUser    string
 	toLevel   int = -1
 )
 
 func init() {
-	flag.StringVar(&subdomain, "subdomain", subdomain, "The subdomain to be used for the Pagerduty API.")
-	flag.StringVar(&apiKey, "api-key", apiKey, "The api-key authorized for calls to the Pagerduty API.")
+	flag.StringVar(&authToken, "authtoken", authToken, "The authorization token for calls to the Pagerduty API.")
 
 	flag.StringVar(&fromUser, "from-user", fromUser,
 		`The user who is currently assigned incidents that should be reassigned elsewhere.
@@ -36,8 +34,8 @@ func init() {
 
 	flag.Parse()
 
-	if subdomain == "" || apiKey == "" {
-		log.Fatalln("PagerDuty subdomain and API token are required.")
+	if authToken == "" {
+		log.Fatalln("PagerDuty auth token is required.")
 	}
 
 	if fromUser == "" {
@@ -50,16 +48,17 @@ func init() {
 }
 
 func main() {
-	pd := pagerduty.New(subdomain, apiKey)
+	pd := pagerduty.NewClient(authToken)
 
-	us := finduser.Service{*pd.Users}
+	us := finduser.Client{*pd}
 	u, err := us.FindAndValidate(fromUser)
 	if err != nil {
 		log.Fatalln("Failed to validate user: " + err.Error())
 	}
 	log.Printf("Found from-user: %v, id: %v\n", u.Name, u.ID)
 
-	var rOpts = pagerduty.ReassignOptions{RequesterID: u.ID}
+	var manageIncident pagerduty.Incident
+	manageIncident.Type = "incident_reference"
 	if toUser != "" {
 		toU, err := us.FindAndValidate(toUser)
 		if err != nil {
@@ -67,23 +66,35 @@ func main() {
 		}
 
 		log.Printf("Found to-user: %v, id: %v\n", toU.Name, toU.ID)
-		rOpts.AssignedToUser = toU.ID
+		manageIncident.Assignments = []pagerduty.Assignment{
+			pagerduty.Assignment{
+				Assignee: pagerduty.APIObject{
+					ID:   toU.ID,
+					Type: "user_reference",
+				},
+			},
+		}
 	}
 	if toLevel != -1 {
-		rOpts.EscalationLevel = toLevel
+		manageIncident.EscalationLevel = uint(toLevel)
 	}
 
-	incidents, err := pd.Incidents.ListAll(&pagerduty.IncidentsOptions{AssignedToUser: u.ID})
+	resp, err := pd.ListIncidents(pagerduty.ListIncidentsOptions{UserIDs: []string{u.ID}})
 
 	if err != nil {
 		log.Fatalln("Failed to fetch incidents for user: " + err.Error())
-	} else {
-		for _, incident := range incidents {
-			log.Printf("incident: %v status: %v\n", incident.ID, incident.Status)
-			_, err := pd.Incidents.Reassign(incident.ID, &rOpts)
-			if err != nil {
-				log.Fatalln("Failed to reassign incident: " + err.Error())
-			}
-		}
 	}
+
+	manage := make([]pagerduty.Incident, len(resp.Incidents))
+	for i, incident := range resp.Incidents {
+		log.Printf("incident: %v status: %v\n", incident.ID, incident.Status)
+		manage[i] = manageIncident
+		manage[i].ID = incident.ID
+	}
+
+	err = pd.ManageIncidents(u.Email, []pagerduty.Incident(manage))
+	if err != nil {
+		log.Fatalln("Failed to manage incidents: " + err.Error())
+	}
+
 }
