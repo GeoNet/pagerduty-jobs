@@ -9,7 +9,7 @@ services:
   - docker
 
 before_deploy:
-  - docker login --username="geonet+dockerbuild" --password="${docker_username}" quay.io
+  - docker login --username="geonet+dockerbuild" --password="${docker_password}" quay.io
 
 deploy:
   skip_cleanup: true
@@ -24,6 +24,6 @@ notifications:
 env:
   global:
     - ALPINE_VERSION=3.8
-    - secure: "Tma+yLMj8JgUP+5B18qIQVR1mS0jOZO8WamMeIzNvQBpGYHffMlmdzzGse5tVBQ6Pcsty/KmaUjG23ujC5hsuWwJHL1q/UeJ0E2dMqtGSumK36WY9NJwDBGfrP74sv60KoTlLnbwy7Y5f4z/NPRrC6ssVyHbURVH+HErhZ47IzlPS9DS/lwTejL6CkR9aRRZ0MS005TI9/py0sVpUoHkf29ioid7WbZRihdFL8rhn9d+uXil0metQTcIeuzysum23wddhgql845BmqW0Jy6XkrtLmVfiJ5wPTL22Ajt6CZnPacpw3PlK3EIxE//Om0/LVwZa/jx/tLnn7SrYccA0DlhkawSqJxWllAQhDHpai7R17hS6zJ0D1TxlyH49Ctha+OqNQ0Cc0ZUHXNG8VQ5Dcuoo4g+r/Ewu4gJvfcd+vSQM9904kBHM0yJ7/Xi9qB4QdsPEMWrglcnVIv39pQ5bU+cAKG4o/bTVGUZIp7N0CF55P2DWpI10mnHKYp+SzN2FpU8CaGXKzpPas8XDs8inTv2DrQ2bzEo0byx0wsgfMKFSzh9RurchPchE3vN5XOOgev+6I03zeB2x0oQ3GcFZ8Zc25FPB3gInJQM4/IokksXw4AlmO937e+u/2UD4KDGJSkKbKhw45Lqu/s6YMuqQhQku/psE6e/k3K1hIcxgWNE="
+    - secure: "uIa2VmPHKppdep5cX00HkLtNAUqNFx+J1qapKGw9BLxEkxcslV4fuSGLjC9jJC4tnC61TZeJSto0sUivkPYiWBUGPz/koiEjqJoFzCmVOxP5rxOw0OFsk5CAtFpPxeQKbW5sclbZlybJ/YAq30k8aDA4WLlMGo46I4LuNGnGak8j9rKmKxs7nWx4eBk/US5+Bi3BSWVfU3wJKP3xIm4j9pX6CK+VAbDX4kuc39IEuSqeO7Wt2CsPHI7uNWHXiBVVFZW44c9fECwER3PplLr+Tz6vcWAPusyI3k3X+8ZgL2ndiBStXqcmvXNz30CWl87gYejywBg4KCFbM3PpJ2uhCsxsZ/DUWI7Ih+TmPB2HTIpQq70cfE+ZvmsXTGXvASRUQ3Xbf0URP5/FAm5o3cyMkkLJbcQC9JilXsBOHKmZEaA0RmAm6R5tHdpFWFqfVnyOvYOg2e0ps5rQRGKiSszoofqvwExeTUe1VPuitIqF59okuEGtiIJgikzxRDlnN1cwUIgHnvFtaZM++cQQ8GC0JFs1mSq3jsmn1pOVY3WoWj6VgPdMla2pnaqSHR0Ap7Zki5YQDbkDxc+znrTpE2X10JzVncNXRKUjpud023+t/1w3obyHa5GycgYEgKJZJNP6+BPqraJioTEvwPz9HLsD6MrEWwknR27hnZD/CcSZnt8=" # docker_password
 
 #  vim: set ts=2 sw=2 tw=0 et:
