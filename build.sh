@@ -17,9 +17,9 @@ if [ $# -eq 0 ]; then
 fi
 
 # Go Version
-GO_VERSION=${TRAVIS_GO_VERSION:-1.9}
+GO_VERSION=${TRAVIS_GO_VERSION:-1.13.1}
 # Alpine Version
-ALPINE_VERSION=${ALPINE_VERSION:-3.6}
+ALPINE_VERSION=${ALPINE_VERSION:-3.10}
 # code will be compiled in this container
 BUILD_CONTAINER=golang:${GO_VERSION}-alpine${ALPINE_VERSION}
 GH_USER=${GH_USER:-GeoNet}
@@ -47,7 +47,7 @@ do
     cmd=${i##*/}
 
     docker run --rm \
-        -e "GOBIN=/usr/src/go/src/github.com/${GH_USER}/${CWD}/${DOCKER_TMP}" -e "GOPATH=/usr/src/go" -e "CGO_ENABLED=0" -e "GOOS=linux" -e "BUILD=$BUILD" \
+        -e "GOBIN=/usr/src/go/src/github.com/${GH_USER}/${CWD}/${DOCKER_TMP}" -e "GOPATH=/usr/src/go" -e "GOFLAGS=-mod=vendor" -e "CGO_ENABLED=0" -e "GOOS=linux" -e "BUILD=$BUILD" \
         -v "$PWD":/usr/src/go/src/github.com/${GH_USER}/${CWD} \
         -w /usr/src/go/src/github.com/${GH_USER}/${CWD} ${BUILD_CONTAINER} \
         go install -a -ldflags "-X main.Prefix=${i}/${VERSION}" -installsuffix cgo ./${i}
