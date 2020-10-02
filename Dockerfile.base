@@ -1,4 +1,4 @@
-FROM alpine
+FROM quay.io/geonet/alpine:latest
 
 RUN apk add --update ca-certificates tzdata && \
 	rm -rf /var/cache/apk/*
