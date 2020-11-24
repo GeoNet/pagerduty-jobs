@@ -16,7 +16,7 @@ deploy:
   provider: script
   script: ./build-push.sh cmd/pd-reassign-all
   on:
-    branch: master
+    branch: main
 
 notifications:
   email: false
