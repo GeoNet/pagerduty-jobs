@@ -44,6 +44,7 @@ type Schedule struct {
 	Description         string          `json:"description,omitempty"`
 	EscalationPolicies  []APIObject     `json:"escalation_policies,omitempty"`
 	Users               []APIObject     `json:"users,omitempty"`
+	Teams               []APIReference  `json:"teams,omitempty"`
 	ScheduleLayers      []ScheduleLayer `json:"schedule_layers,omitempty"`
 	OverrideSubschedule ScheduleLayer   `json:"override_subschedule,omitempty"`
 	FinalSchedule       ScheduleLayer   `json:"final_schedule,omitempty"`
@@ -163,6 +164,12 @@ type ListOverridesOptions struct {
 	Overflow bool   `url:"overflow,omitempty"`
 }
 
+// ListOverridesResponse is the data structure returned from calling the ListOverrides API endpoint.
+type ListOverridesResponse struct {
+	APIListObject
+	Overrides []Override `json:"overrides,omitempty"`
+}
+
 // Overrides are any schedule layers from the override layer.
 type Override struct {
 	ID    string    `json:"id,omitempty"`
@@ -172,7 +179,7 @@ type Override struct {
 }
 
 // ListOverrides lists overrides for a given time range.
-func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, error) {
+func (c *Client) ListOverrides(id string, o ListOverridesOptions) (*ListOverridesResponse, error) {
 	v, err := query.Values(o)
 	if err != nil {
 		return nil, err
@@ -181,15 +188,8 @@ func (c *Client) ListOverrides(id string, o ListOverridesOptions) ([]Override, e
 	if err != nil {
 		return nil, err
 	}
-	var result map[string][]Override
-	if err := c.decodeJSON(resp, &result); err != nil {
-		return nil, err
-	}
-	overrides, ok := result["overrides"]
-	if !ok {
-		return nil, fmt.Errorf("JSON response does not have overrides field")
-	}
-	return overrides, nil
+	var result ListOverridesResponse
+	return &result, c.decodeJSON(resp, &result)
 }
 
 // CreateOverride creates an override for a specific user covering the specified time range.

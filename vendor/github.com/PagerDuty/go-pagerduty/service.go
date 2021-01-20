@@ -72,6 +72,8 @@ type Service struct {
 	SupportHours           *SupportHours        `json:"support_hours,omitempty"`
 	ScheduledActions       []ScheduledAction    `json:"scheduled_actions,omitempty"`
 	AlertCreation          string               `json:"alert_creation,omitempty"`
+	AlertGrouping          string               `json:"alert_grouping,omitempty"`
+	AlertGroupingTimeout   *uint                `json:"alert_grouping_timeout,omitempty"`
 }
 
 // ListServiceOptions is the data structure used when calling the ListServices API endpoint.
@@ -126,7 +128,12 @@ func (c *Client) CreateService(s Service) (*Service, error) {
 
 // UpdateService updates an existing service.
 func (c *Client) UpdateService(s Service) (*Service, error) {
-	resp, err := c.put("/services/"+s.ID, s, nil)
+	body := struct {
+		Service `json:"service,omitempty"`
+	}{
+		s,
+	}
+	resp, err := c.put("/services/"+s.ID, body, nil)
 	return getServiceFromResponse(c, resp, err)
 }
 

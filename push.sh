@@ -4,8 +4,6 @@
 #
 # usage: ./build-push.sh project [project]
 
-./build.sh $@
-
 REPO_BASE=${REPO_BASE:-quay.io/geonet}
 
 VERSION='git-'`git rev-parse --short HEAD`
