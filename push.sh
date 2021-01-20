@@ -12,6 +12,7 @@ for i in "$@"
 do
     cmd=${i##*/}
 
+    docker tag ${REPO_BASE}/${cmd}:${VERSION} ${REPO_BASE}/${cmd}:latest
     docker push ${REPO_BASE}/${cmd}:${VERSION}
     docker push ${REPO_BASE}/${cmd}:latest
 done

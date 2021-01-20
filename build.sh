@@ -37,7 +37,7 @@ for i in "$@"; do
     --build-arg=BUILDER_IMAGE="$BUILDER_IMAGE" \
     --build-arg=GIT_COMMIT_SHA="$VERSION" \
     --build-arg=ASSET_DIR="./cmd/$i/assets" \
-    -t "quay.io/geonet/${i}:latest" \
+    -t "quay.io/geonet/${i}:${VERSION}" \
     -f $dockerfile .
 
 done
