@@ -2,5 +2,4 @@
 ## explicit
 github.com/PagerDuty/go-pagerduty
 # github.com/google/go-querystring v1.0.0
-## explicit
 github.com/google/go-querystring/query
