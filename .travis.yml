@@ -23,6 +23,12 @@ deploy:
 
 notifications:
   email: false
+  slack:
+    if: branch in (main, staging, production)
+    on_success: never
+    on_failure: always
+    on_pull_requests: false
+    secure: mdLzzBjyxgc0VSl1/7KIdaeOR4bnwkdTjt7YyEiwVoTJHyzK27GoxZytCvTqtW7d95c/ejJAGNK8xlQ2XVjgwCekz6lv7yJ6Rve9v8hkeYJwaIJMUdliy0RpbpotIVweeAAKtEHe5dyO7WH7UJk463WcfOl+qqii0W9zQ19oww8f7QC0STIPf+7xwYBUHOBFelaP2vrA4SsXb6XRhJD5726yK9wN/SPT9i3wzui/2CPuh02oFQGmgA8k8Pg1Nm6GSN3P+lbKGLVzwHFu0kVs/2TyOaOZSAhh3RnL+VErCipLCxJR+ByiFXnuHma3fIpmAXiSmjLvbRGv9k46ivw77Qn5TPCTF1HoBB7CO9LHOOHq/Q2AiIzGNjarzizPmojdGDybWGBXJyDi0K+sHD4/6S70qyiF/t1MRXe4FdO9Ve/9hJ4kb3guOWdBPrjGi2J5E+IenVJPULuWQT6/73PX4GchkVpmzSa6OolKYruHn9U7UrwHG+Of08rB90y9dVa+pBSa8YiEaRtAdeXRU0RaKWhfhhyXGeIOrdZYwA4oMpQFTwtya2om2b0P1ujofrgq4DBfVyp4yCz6KvSIC81pxGOLpqFkBjlOVsfxyVwpXd4hvtPjUV0iTi34fObelJ/dRQ4RK5JO+g2ot/jcXxdNQ9X0Ls+tAMvQR/u9P8EIcpU=
 
 env:
   global:
