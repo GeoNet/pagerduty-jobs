@@ -17,13 +17,13 @@ if [ $# -eq 0 ]; then
 fi
 
 # code will be compiled in this container
-BUILDER_IMAGE='quay.io/geonet/golang:1.15-alpine'
+BUILDER_IMAGE='quay.io/geonet/golang:1.16-alpine'
 RUNNER_IMAGE='quay.io/geonet/alpine:3.10'
 
 VERSION='git-'$(git rev-parse --short HEAD)
 
 for i in "$@"; do
- 
+
   mkdir -p cmd/$i/assets
   dockerfile="Dockerfile"
   if test -f "cmd/${i}/Dockerfile"; then
