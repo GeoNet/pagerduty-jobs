@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"log"
@@ -50,15 +51,15 @@ func init() {
 func main() {
 	pd := pagerduty.NewClient(authToken)
 
-	us := finduser.Client{*pd}
-	u, err := us.FindAndValidate(fromUser)
+	us := finduser.Client{Client: *pd}
+	u, err := us.FindAndValidate(context.Background(), fromUser)
 	if err != nil {
 		log.Fatalln("Failed to validate user: " + err.Error())
 	}
 	log.Printf("Found from-user: %v, id: %v\n", u.Name, u.ID)
 
 	if toUser != "" {
-		toU, err := us.FindAndValidate(toUser)
+		toU, err := us.FindAndValidate(context.Background(), toUser)
 		if err != nil {
 			log.Fatalln("Failed to validate user: " + err.Error())
 		}
@@ -66,7 +67,7 @@ func main() {
 		log.Printf("Found to-user: %v, id: %v\n", toU.Name, toU.ID)
 	}
 
-	resp, err := pd.ListIncidents(pagerduty.ListIncidentsOptions{UserIDs: []string{u.ID}})
+	resp, err := pd.ListIncidentsWithContext(context.Background(), pagerduty.ListIncidentsOptions{UserIDs: []string{u.ID}})
 
 	if err != nil {
 		log.Fatalln("Failed to fetch incidents for user: " + err.Error())
@@ -79,7 +80,7 @@ func main() {
 
 		// looking for current on-call user
 		if toUser == "" {
-			res, err := pd.ListOnCalls(pagerduty.ListOnCallOptions{EscalationPolicyIDs: []string{incident.EscalationPolicy.ID}})
+			res, err := pd.ListOnCallsWithContext(context.Background(), pagerduty.ListOnCallOptions{EscalationPolicyIDs: []string{incident.EscalationPolicy.ID}})
 			if err != nil {
 				continue
 			}
@@ -121,10 +122,16 @@ func main() {
 			},
 		}
 		manage[i].ID = incident.APIObject.ID
-		manage[i].Type = "incident_reference"
+		//
+		//deprecated: Because the Type field can only have the value of "incident" or
+		//"incident_reference" when managing an incident, the CreateIncident* methods
+		//always set this value to "incident" because this struct is not an incident_reference.
+		//Any other value will be overwritten
+		//
+		//manage[i].Type = "incident_reference"
 	}
 
-	_, err = pd.ManageIncidents(u.Email, (manage))
+	_, err = pd.ManageIncidentsWithContext(context.Background(), u.Email, (manage))
 	if err != nil {
 		log.Fatalln("Failed to manage incidents: " + err.Error())
 	}

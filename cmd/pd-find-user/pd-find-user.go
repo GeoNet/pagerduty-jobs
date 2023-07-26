@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -34,8 +35,8 @@ func init() {
 func main() {
 	pd := pagerduty.NewClient(authToken)
 
-	us := finduser.Client{*pd}
-	u, err := us.FindAndValidate(user)
+	us := finduser.Client{Client: *pd}
+	u, err := us.FindAndValidate(context.Background(), user)
 	if err != nil {
 		log.Fatalln("Failed to validate user: " + err.Error())
 	}

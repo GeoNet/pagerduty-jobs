@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"log"
@@ -39,7 +40,7 @@ func main() {
 	}
 
 	log.Printf("opts: %v\n", opts)
-	resp, err := pd.ListIncidents(opts)
+	resp, err := pd.ListIncidentsWithContext(context.Background(), opts)
 
 	if err != nil {
 		log.Fatalln("Failed to fetch incidents for given filter: " + err.Error())

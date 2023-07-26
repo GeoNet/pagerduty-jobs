@@ -1,6 +1,7 @@
 package finduser
 
 import (
+	"context"
 	"errors"
 
 	pagerduty "github.com/PagerDuty/go-pagerduty"
@@ -12,15 +13,15 @@ type Client struct {
 	pagerduty.Client
 }
 
-func (c *Client) FindAndValidate(in string) (*pagerduty.User, error) {
-	u, e := c.GetUser(in, pagerduty.GetUserOptions{})
+func (c *Client) FindAndValidate(ctx context.Context, in string) (*pagerduty.User, error) {
+	u, e := c.GetUserWithContext(ctx, in, pagerduty.GetUserOptions{})
 	if e == nil && u.ID == in {
 		return u, e
 	}
-	return c.FindUser(in)
+	return c.FindUser(ctx, in)
 }
-func (c *Client) FindUser(in string) (*pagerduty.User, error) {
-	resp, e := c.ListUsers(pagerduty.ListUsersOptions{Query: in})
+func (c *Client) FindUser(ctx context.Context, in string) (*pagerduty.User, error) {
+	resp, e := c.ListUsersWithContext(ctx, pagerduty.ListUsersOptions{Query: in})
 	if e != nil {
 		return nil, e
 	}
