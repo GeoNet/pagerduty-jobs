@@ -74,7 +74,7 @@ func main() {
 
 	manage := make([]pagerduty.ManageIncidentsOptions, len(resp.Incidents))
 	for i, incident := range resp.Incidents {
-		log.Printf("incident: %v status: %v\n", incident.Id, incident.Status)
+		log.Printf("incident: %v status: %v\n", incident.APIObject.ID, incident.Status)
 		log.Printf("Escap:%v\n", incident.EscalationPolicy.ID)
 
 		// looking for current on-call user
@@ -96,7 +96,7 @@ func main() {
 				log.Printf("user oncall:%v\n", toUser)
 				log.Printf("user oncall:%v\n", users.EscalationLevel)
 			}
-			log.Printf("incident:%v\n", incident.Id)
+			log.Printf("incident:%v\n", incident.APIObject.ID)
 
 			manage[i].Assignments = []pagerduty.Assignee{
 				{
@@ -120,7 +120,7 @@ func main() {
 				},
 			},
 		}
-		manage[i].ID = incident.Id
+		manage[i].ID = incident.APIObject.ID
 		manage[i].Type = "incident_reference"
 	}
 
