@@ -1,6 +1,7 @@
 package pagerduty
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -43,17 +44,50 @@ type ListBusinessServicesResponse struct {
 
 // ListBusinessServiceOptions is the data structure used when calling the ListBusinessServices API endpoint.
 type ListBusinessServiceOptions struct {
-	APIListObject
+	// Limit is the pagination parameter that limits the number of results per
+	// page. PagerDuty defaults this value to 25 if omitted, and sets an upper
+	// bound of 100.
+	Limit uint `url:"limit,omitempty"`
+
+	// Offset is the pagination parameter that specifies the offset at which to
+	// start pagination results. When trying to request the next page of
+	// results, the new Offset value should be currentOffset + Limit.
+	Offset uint `url:"offset,omitempty"`
+
+	// Total is the pagination parameter to request that the API return the
+	// total count of items in the response. If this field is omitted or set to
+	// false, the total number of results will not be sent back from the PagerDuty API.
+	//
+	// Setting this to true will slow down the API response times, and so it's
+	// recommended to omit it unless you've a specific reason for wanting the
+	// total count of items in the collection.
+	Total bool `url:"total,omitempty"`
 }
 
-// ListBusinessServices lists existing business services.
+// ListBusinessServices lists existing business services. This method currently
+// handles pagination of the response, so all business services should be
+// present.
+//
+// Please note that the automatic pagination will be removed in v2 of this
+// package, so it's recommended to use ListBusinessServicesPaginated instead.
 func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusinessServicesResponse, error) {
+	bss, err := c.ListBusinessServicesPaginated(context.Background(), o)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ListBusinessServicesResponse{BusinessServices: bss}, nil
+}
+
+// ListBusinessServicesPaginated lists existing business services, automatically
+// handling pagination and returning the full collection.
+func (c *Client) ListBusinessServicesPaginated(ctx context.Context, o ListBusinessServiceOptions) ([]*BusinessService, error) {
 	queryParms, err := query.Values(o)
 	if err != nil {
 		return nil, err
 	}
-	businessServiceResponse := new(ListBusinessServicesResponse)
-	businessServices := make([]*BusinessService, 0)
+
+	var businessServices []*BusinessService
 
 	// Create a handler closure capable of parsing data from the business_services endpoint
 	// and appending resultant business_services to the return slice.
@@ -75,53 +109,92 @@ func (c *Client) ListBusinessServices(o ListBusinessServiceOptions) (*ListBusine
 	}
 
 	// Make call to get all pages associated with the base endpoint.
-	if err := c.pagedGet("/business_services"+queryParms.Encode(), responseHandler); err != nil {
+	if err := c.pagedGet(ctx, "/business_services?"+queryParms.Encode(), responseHandler); err != nil {
 		return nil, err
 	}
-	businessServiceResponse.BusinessServices = businessServices
 
-	return businessServiceResponse, nil
+	return businessServices, nil
 }
 
 // CreateBusinessService creates a new business service.
-func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	data := make(map[string]*BusinessService)
-	data["business_service"] = b
-	resp, err := c.post("/business_services", data, nil)
-	return getBusinessServiceFromResponse(c, resp, err)
+//
+// Deprecated: Use CreateBusinessServiceWithContext instead
+func (c *Client) CreateBusinessService(b *BusinessService) (*BusinessService, error) {
+	return c.CreateBusinessServiceWithContext(context.Background(), b)
+}
+
+// CreateBusinessServiceWithContext creates a new business service.
+func (c *Client) CreateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
+	d := map[string]*BusinessService{
+		"business_service": b,
+	}
+
+	resp, err := c.post(ctx, "/business_services", d, nil)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
 // GetBusinessService gets details about a business service.
-func (c *Client) GetBusinessService(ID string) (*BusinessService, *http.Response, error) {
-	resp, err := c.get("/business_services/" + ID)
-	return getBusinessServiceFromResponse(c, resp, err)
+//
+// Deprecated: Use GetBusinessServiceWithContext instead.
+func (c *Client) GetBusinessService(id string) (*BusinessService, error) {
+	return c.GetBusinessServiceWithContext(context.Background(), id)
+}
+
+// GetBusinessServiceWithContext gets details about a business service.
+func (c *Client) GetBusinessServiceWithContext(ctx context.Context, id string) (*BusinessService, error) {
+	resp, err := c.get(ctx, "/business_services/"+id)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
 }
 
 // DeleteBusinessService deletes a business_service.
-func (c *Client) DeleteBusinessService(ID string) error {
-	_, err := c.delete("/business_services/" + ID)
+//
+// Deprecated: Use DeleteBusinessServiceWithContext instead.
+func (c *Client) DeleteBusinessService(id string) error {
+	return c.DeleteBusinessServiceWithContext(context.Background(), id)
+}
+
+// DeleteBusinessServiceWithContext deletes a business_service.
+func (c *Client) DeleteBusinessServiceWithContext(ctx context.Context, id string) error {
+	_, err := c.delete(ctx, "/business_services/"+id)
 	return err
 }
 
 // UpdateBusinessService updates a business_service.
-func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, *http.Response, error) {
-	v := make(map[string]*BusinessService)
-	v["business_service"] = b
-	resp, err := c.put("/business_services/"+b.ID, v, nil)
-	return getBusinessServiceFromResponse(c, resp, err)
+//
+// Deprecated: Use UpdateBusinessServiceWithContext instead.
+func (c *Client) UpdateBusinessService(b *BusinessService) (*BusinessService, error) {
+	return c.UpdateBusinessServiceWithContext(context.Background(), b)
 }
 
-func getBusinessServiceFromResponse(c *Client, resp *http.Response, err error) (*BusinessService, *http.Response, error) {
+// UpdateBusinessServiceWithContext updates a business_service.
+func (c *Client) UpdateBusinessServiceWithContext(ctx context.Context, b *BusinessService) (*BusinessService, error) {
+	id := b.ID
+	b.ID = ""
+
+	d := map[string]*BusinessService{
+		"business_service": b,
+	}
+
+	resp, err := c.put(ctx, "/business_services/"+id, d, nil)
+	return getBusinessServiceFromResponse(resp, err, c.decodeJSON)
+}
+
+func getBusinessServiceFromResponse(resp *http.Response, err error, decodeFn func(*http.Response, interface{}) error) (*BusinessService, error) {
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	var target map[string]BusinessService
-	if dErr := c.decodeJSON(resp, &target); dErr != nil {
-		return nil, nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
+	if dErr := decodeFn(resp, &target); dErr != nil {
+		return nil, fmt.Errorf("Could not decode JSON response: %v", dErr)
 	}
-	t, nodeOK := target["business_service"]
+
+	const rootNode = "business_service"
+
+	t, nodeOK := target[rootNode]
 	if !nodeOK {
-		return nil, nil, fmt.Errorf("JSON response does not have business_service field")
+		return nil, fmt.Errorf("JSON response does not have %s field", rootNode)
 	}
-	return &t, resp, nil
+
+	return &t, nil
 }

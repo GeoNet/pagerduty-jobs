@@ -1,7 +1,7 @@
 package pagerduty
 
 import (
-	"net/http"
+	"context"
 )
 
 // ServiceDependency represents a relationship between a business and technical service
@@ -24,45 +24,89 @@ type ListServiceDependencies struct {
 }
 
 // ListBusinessServiceDependencies lists dependencies of a business service.
-func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.get("/service_dependencies/business_services/" + businessServiceID)
+//
+// Deprecated: Use ListBusinessServiceDependenciesWithContext instead.
+func (c *Client) ListBusinessServiceDependencies(businessServiceID string) (*ListServiceDependencies, error) {
+	return c.ListBusinessServiceDependenciesWithContext(context.Background(), businessServiceID)
+}
+
+// ListBusinessServiceDependenciesWithContext lists dependencies of a business service.
+func (c *Client) ListBusinessServiceDependenciesWithContext(ctx context.Context, businessServiceID string) (*ListServiceDependencies, error) {
+	resp, err := c.get(ctx, "/service_dependencies/business_services/"+businessServiceID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	var result ListServiceDependencies
-	return &result, resp, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 // ListTechnicalServiceDependencies lists dependencies of a technical service.
-func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServiceDependencies, *http.Response, error) {
-	resp, err := c.get("/service_dependencies/technical_services/" + serviceID)
+//
+// Deprecated: Use ListTechnicalServiceDependenciesWithContext instead.
+func (c *Client) ListTechnicalServiceDependencies(serviceID string) (*ListServiceDependencies, error) {
+	return c.ListTechnicalServiceDependenciesWithContext(context.Background(), serviceID)
+}
+
+// ListTechnicalServiceDependenciesWithContext lists dependencies of a technical service.
+func (c *Client) ListTechnicalServiceDependenciesWithContext(ctx context.Context, serviceID string) (*ListServiceDependencies, error) {
+	resp, err := c.get(ctx, "/service_dependencies/technical_services/"+serviceID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	var result ListServiceDependencies
-	return &result, resp, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 // AssociateServiceDependencies Create new dependencies between two services.
-func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	data := make(map[string]*ListServiceDependencies)
-	data["relationships"] = dependencies
-	resp, err := c.post("/service_dependencies/associate", data, nil)
+//
+// Deprecated: Use AssociateServiceDependenciesWithContext instead.
+func (c *Client) AssociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, error) {
+	return c.AssociateServiceDependenciesWithContext(context.Background(), dependencies)
+}
+
+// AssociateServiceDependenciesWithContext Create new dependencies between two services.
+func (c *Client) AssociateServiceDependenciesWithContext(ctx context.Context, dependencies *ListServiceDependencies) (*ListServiceDependencies, error) {
+	resp, err := c.post(ctx, "/service_dependencies/associate", dependencies, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	var result ListServiceDependencies
-	return &result, resp, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 // DisassociateServiceDependencies Disassociate dependencies between two services.
-func (c *Client) DisassociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, *http.Response, error) {
-	data := make(map[string]*ListServiceDependencies)
-	data["relationships"] = dependencies
-	resp, err := c.post("/service_dependencies/disassociate", data, nil)
+//
+// Deprecated: Use DisassociateServiceDependenciesWithContext instead.
+func (c *Client) DisassociateServiceDependencies(dependencies *ListServiceDependencies) (*ListServiceDependencies, error) {
+	return c.DisassociateServiceDependenciesWithContext(context.Background(), dependencies)
+}
+
+// DisassociateServiceDependenciesWithContext Disassociate dependencies between two services.
+func (c *Client) DisassociateServiceDependenciesWithContext(ctx context.Context, dependencies *ListServiceDependencies) (*ListServiceDependencies, error) {
+	resp, err := c.post(ctx, "/service_dependencies/disassociate", dependencies, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	var result ListServiceDependencies
-	return &result, resp, c.decodeJSON(resp, &result)
+	if err = c.decodeJSON(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
