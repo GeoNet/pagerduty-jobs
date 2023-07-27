@@ -50,7 +50,7 @@ func init() {
 func main() {
 	pd := pagerduty.NewClient(authToken)
 
-	us := finduser.Client{*pd}
+	us := finduser.Client{Client: *pd}
 	u, err := us.FindAndValidate(fromUser)
 	if err != nil {
 		log.Fatalln("Failed to validate user: " + err.Error())

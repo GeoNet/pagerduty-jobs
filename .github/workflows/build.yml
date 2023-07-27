@@ -1,0 +1,33 @@
+---
+name: Go container packaging
+
+on:
+  push: {}
+  pull_request: {}
+  schedule:
+    - cron: "0 0 * * *"
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  actions: read
+  packages: write
+  contents: write
+  pull-requests: write
+  id-token: write
+  security-events: write
+  statuses: write
+  checks: write
+
+jobs:
+  go-container-apps-ghcr:
+    uses: GeoNet/Actions/.github/workflows/reusable-go-container-apps.yml@main
+    with:
+      imagePromotionConfigPath: ./images/config.yaml
+      updateGoVersionAutoMerge: false
+      containerScanningEnabled: false # needs perms
+      paths: >-
+        ./cmd/pd-reassign-all
+
+# vim: set ts=2 sw=2 tw=0 et:
