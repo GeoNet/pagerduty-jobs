@@ -1,0 +1,7 @@
+---
+
+defaultBaseImage: ghcr.io/geonet/base-images/static
+
+baseImageOverrides: {}
+
+# vim: set ts=2 sw=2 tw=0 et:
