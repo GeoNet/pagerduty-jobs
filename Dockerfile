@@ -1,5 +1,5 @@
-ARG BUILDER_IMAGE=quay.io/geonet/golang:1.16-alpine
-ARG RUNNER_IMAGE=quay.io/geonet/alpine:3.10
+ARG BUILDER_IMAGE=ghcr.io/geonet/base-images/go:1.21
+ARG RUNNER_IMAGE=ghcr.io/geonet/base-images/alpine:3.18
 ARG RUN_USER=nobody
 # Only support image based on AlpineLinux
 FROM ${BUILDER_IMAGE} as builder
