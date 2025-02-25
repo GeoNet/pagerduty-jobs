@@ -2,7 +2,7 @@
 
 Project for jobs related to pagerduty.
 
-[![Build Status](https://travis-ci.org/GeoNet/pagerduty-jobs.svg?branch=main)](https://travis-ci.org/GeoNet/pagerduty-jobs)
+![Go container packaging](https://github.com/GeoNet/pagerduty-jobs/actions/workflows/build.yml/badge.svg)
 
 ## pd-reassign-all
 
@@ -13,4 +13,3 @@ For example:
 # ./bin/pd-reassign-all -subdomain="pd-subdomain" -apikey="123apikeyxyz" -from-user=PD123XYZ -to-level=1
 2015/08/21 15:42:41 Found from-user: Joe Bloggs, id: PD123XYZ
 ```
-

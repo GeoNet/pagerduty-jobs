@@ -1,6 +1,6 @@
 module github.com/GeoNet/pagerduty-jobs
 
-go 1.20
+go 1.23
 
 require github.com/PagerDuty/go-pagerduty v1.3.0
 
