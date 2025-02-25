@@ -2,8 +2,12 @@
 name: Go container packaging
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *"
   release:
@@ -21,11 +25,23 @@ permissions:
   checks: write
 
 jobs:
-  go-container-apps-ghcr:
+
+  vars:
+    runs-on: ubuntu-latest
+    outputs:
+      short-sha: ${{ steps.commit.outputs.short-sha }}
+      current-date: ${{ steps.commit.outputs.current-date }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: examine commits details
+        id: commit
+        run: |
+          echo "short-sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "current-date=$(TZ='Pacific/Auckland' date +'%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
+
+  go-container-apps:
     uses: GeoNet/Actions/.github/workflows/reusable-go-container-apps.yml@main
     with:
-      imagePromotionConfigPath: ./images/config.yaml
-      updateGoVersionAutoMerge: false
       containerScanningEnabled: false # needs perms
       paths: >-
         ./cmd/pd-reassign-all
