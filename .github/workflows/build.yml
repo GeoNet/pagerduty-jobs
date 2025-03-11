@@ -27,8 +27,35 @@ permissions:
 jobs:
   go-container-apps:
     uses: GeoNet/Actions/.github/workflows/reusable-go-container-apps.yml@main
+    if: ${{ github.ref != 'refs/heads/main' }}
+    secrets: inherit
     with:
-      containerScanningEnabled: false # needs perms
+      # separate out push targets futher down
+      push: false
+
+  vars:
+    runs-on: ubuntu-latest
+    outputs:
+      short-sha: ${{ steps.commit.outputs.short-sha }}
+      current-date: ${{ steps.commit.outputs.current-date }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: examine commits details
+        id: commit
+        run: |
+          echo "short-sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "current-date=$(TZ='Pacific/Auckland' date +'%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
+
+  ko-build-ghcr:
+    needs: vars
+    uses: GeoNet/Actions/.github/workflows/reusable-ko-build.yml@main
+    if: ${{ github.ref == 'refs/heads/main' }}
+    secrets: inherit
+    with:
+      configPath: .ko.yaml
+      goflags: "-ldflags=-X=main.Release=git-${{needs.vars.outputs.short-sha}}-${{needs.vars.outputs.current-date}}"
+      tags: "latest,${{needs.vars.outputs.current-date}}-git${{needs.vars.outputs.short-sha}}"
+      push: true
       paths: >-
         ./cmd/pd-reassign-all
 
