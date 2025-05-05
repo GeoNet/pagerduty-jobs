@@ -44,7 +44,9 @@ func main() {
 
 	var incidentOpts pagerduty.ListIncidentsOptions
 	incidentOpts.Since = time.Now().AddDate(0, 0, -14).Format(time.RFC3339)
+	incidentOpts.Until = time.Now().Format(time.RFC3339)
 	incidentOpts.ServiceIDs = svcIDs
+	incidentOpts.Limit = 100
 	log.Printf("opts: %v\n", incidentOpts)
 	resp, err := pd.ListIncidents(incidentOpts)
 
@@ -56,9 +58,25 @@ func main() {
 	for _, i := range resp.Incidents {
 		log.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
 	}
+	log.Printf("paginated? %t", resp.More)
+	var scheduleOpts pagerduty.ListSchedulesOptions
+	scheduleOpts.Query = "Application"
+	respSched, err := pd.ListSchedules(scheduleOpts)
+	if err != nil {
+		log.Fatalln("failed to read schedules")
+	}
+
+	var onCallOpts pagerduty.ListOnCallUsersOptions
+	onCallOpts.Since = time.Now().AddDate(0, 0, -14).Format(time.RFC3339)
+	onCallOpts.Until = time.Now().Format(time.RFC3339)
+
+	for _, sched := range respSched.Schedules {
+		respUser, err := pd.ListOnCallUsers(sched.ID, onCallOpts)
+		if err != nil {
+			log.Println("failed to read " + sched.ID)
+			continue
+		}
+		log.Printf("Schedule: %s Username:? %s\n", sched.Summary, respUser[0].Name)
+	}
 
 }
-
-//https://geonet.pagerduty.com/teams/PXRFYRO/users
-
-//loop through teams services
