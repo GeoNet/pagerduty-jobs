@@ -3,6 +3,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -54,11 +55,23 @@ func main() {
 		log.Fatalln("Failed to fetch incidents for given filter: " + err.Error())
 	}
 
-	log.Printf("found %d incidents\n", len(resp.Incidents))
-	for _, i := range resp.Incidents {
-		log.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
+	fmt.Printf("found %d incidents\n", len(resp.Incidents))
+	page := 0
+	for resp.More {
+		for _, i := range resp.Incidents {
+			fmt.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
+		}
+		page++
+		log.Printf("page:%d\n", page)
+		incidentOpts.Offset = incidentOpts.Offset + incidentOpts.Limit
+		resp, err = pd.ListIncidents(incidentOpts)
+		if err != nil {
+			log.Fatalln("Failed to fetch incidents for given filter: " + err.Error())
+		}
+		log.Printf("paginated? %t", resp.More)
 	}
-	log.Printf("paginated? %t", resp.More)
+	fmt.Println("printing schedules")
+
 	var scheduleOpts pagerduty.ListSchedulesOptions
 	scheduleOpts.Query = "Application"
 	respSched, err := pd.ListSchedules(scheduleOpts)
