@@ -57,12 +57,15 @@ func main() {
 
 	fmt.Printf("found %d incidents\n", len(resp.Incidents))
 	page := 0
+	for _, i := range resp.Incidents {
+		fmt.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
+	}
 	for resp.More {
 		for _, i := range resp.Incidents {
 			fmt.Printf("%v, %d, %s\n", i.CreatedAt, i.IncidentNumber, i.Summary)
 		}
 		page++
-		log.Printf("page:%d\n", page)
+		fmt.Printf("page:%d\n", page)
 		incidentOpts.Offset = incidentOpts.Offset + incidentOpts.Limit
 		resp, err = pd.ListIncidents(incidentOpts)
 		if err != nil {
